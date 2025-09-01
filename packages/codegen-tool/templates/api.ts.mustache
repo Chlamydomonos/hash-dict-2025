@@ -1,0 +1,6 @@
+import { createApi } from '{{& rootRelativePath }}/create-api';
+import type { {{ name }}Req, {{ name }}Res } from 'common-lib/api/{{& path }}';
+
+createApi<{{ name }}Req, {{ name }}Res>('/{{& path }}', async (req, res) => {
+    // TODO
+})

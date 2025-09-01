@@ -1,0 +1,25 @@
+{
+    "name": "backend",
+    "private": "true",
+    "devDependencies": {
+        "@types/express": "^5.0.3",
+        "@types/node": "^24.3.0",
+        "cross-env": "^10.0.0",
+        "prettier": "3.6.2",
+        "rimraf": "^6.0.1",
+        "typescript": "^5.9.2"
+    },
+    "dependencies": {
+        "@sequelize/core": "7.0.0-alpha.46",
+        "@sequelize/postgres": "7.0.0-alpha.46",
+        "@sequelize/sqlite3": "7.0.0-alpha.46",
+        "common-lib": "workspace:*",
+        "express": "^5.1.0",
+        "sqlite3": "^5.1.7"
+    },
+    "scripts": {
+        "build": "rimraf dist && tsc",
+        "build:release": "rimraf dist && tsc --project tsconfig.release.json",
+        "start": "cross-env SQLITE_DB_FILE=local/db.sqlite node dist/main.js"
+    }
+}

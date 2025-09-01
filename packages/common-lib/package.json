@@ -1,0 +1,45 @@
+{
+    "name": "common-lib",
+    "private": "true",
+    "exports": {
+        ".": {
+            "import": {
+                "types": "./dist/es/index.d.ts",
+                "default": "./dist/es/index.js"
+            },
+            "require": {
+                "types": "./dist/commonjs/index.d.ts",
+                "default": "./dist/commonjs/index.js"
+            }
+        },
+        "./*": {
+            "import": {
+                "types": "./dist/es/*.d.ts",
+                "default": "./dist/es/*.js"
+            },
+            "require": {
+                "types": "./dist/commonjs/*.d.ts",
+                "default": "./dist/commonjs/*.js"
+            }
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "clean": "rimraf dist",
+        "build:commonjs": "tsc --project tsconfig.json",
+        "build:es": "tsc --project tsconfig.es.json",
+        "build": "pnpm clean && pnpm build:commonjs && pnpm build:es",
+        "build:commonjs:release": "tsc --project tsconfig.release.json",
+        "build:es:release": "tsc --project tsconfig.es.release.json",
+        "release": "pnpm clean && pnpm build:commonjs:release && pnpm build:es:release"
+    },
+    "devDependencies": {
+        "@types/node": "^22.18.0",
+        "concurrently": "^9.2.1",
+        "prettier": "3.6.2",
+        "rimraf": "^6.0.1",
+        "typescript": "~5.8.3"
+    }
+}

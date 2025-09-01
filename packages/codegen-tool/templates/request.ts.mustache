@@ -1,0 +1,20 @@
+import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios';
+{{# meta }}
+import type { {{ name }}Req, {{ name }}Res } from 'common-lib/api/{{& path }}';
+{{/ meta }}
+
+type ReqDict = {
+{{# meta }}
+    '/{{& path }}': { req: {{ name }}Req; res: {{ name }}Res };
+{{/ meta }}
+};
+
+const client = axios.create({ baseURL: '/api' });
+
+export const request = async <T extends keyof ReqDict>(
+    path: T,
+    req: ReqDict[T]['req'],
+    headers?: AxiosRequestConfig['headers'],
+) => {
+    return (await client.post(path, req, { headers })) as AxiosResponse<ReqDict[T]['res']>;
+};

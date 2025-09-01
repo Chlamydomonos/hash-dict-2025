@@ -1,0 +1,9 @@
+{
+    "name": "hash-dict",
+    "private": true,
+    "scripts": {
+        "build": "cd packages/common-lib && pnpm build && cd ../codegen-tool && pnpm build && pnpm start",
+        "build-backend": "pnpm build && cd packages/backend && pnpm build",
+        "backend": "pnpm build-backend && cd packages/backend && pnpm start"
+    }
+}
