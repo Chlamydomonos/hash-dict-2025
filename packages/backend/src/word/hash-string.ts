@@ -12,10 +12,10 @@ const getInitialHash = (str: string): Base128 => {
         hash |= 0;
     }
 
-    const lastBits = hash & 0x3;
+    const lastBits = hash & 0x4;
 
-    if (lastBits === 3) {
-        // 1/4 概率，生成3位128进制数 (128² 到 128³-1)
+    if (lastBits < 3) {
+        // 3/8 概率，生成3位128进制数 (128² 到 128³-1)
         const range = 128 * 128 * 128 - 128 * 128; // 128³ - 128²
         const value = (hash % range) + 128 * 128; // 确保在3位数范围内
 
@@ -28,7 +28,7 @@ const getInitialHash = (str: string): Base128 => {
         }
         return result;
     } else {
-        // 3/4 概率，生成2位128进制数 (0 到 128²-1)
+        // 5/8 概率，生成2位128进制数 (0 到 128²-1)
         const range = 128 * 128;
         const value = hash % range;
 

@@ -6,7 +6,8 @@ export type WordFindReq = {
 
 export type WordFindRes = WithFailReason<
     {
-        data: { id: number; value: string }[];
+        type: { id: number; end: string };
+        categories: { id: number; value: string }[];
     },
     FailReason<'illegal' | 'not_exists'>
 >;

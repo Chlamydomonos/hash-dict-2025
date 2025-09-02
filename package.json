@@ -4,6 +4,12 @@
     "scripts": {
         "build": "cd packages/common-lib && pnpm build && cd ../codegen-tool && pnpm build && pnpm start",
         "build-backend": "pnpm build && cd packages/backend && pnpm build",
-        "backend": "pnpm build-backend && cd packages/backend && pnpm start"
+        "backend": "pnpm build-backend && cd packages/backend && pnpm start",
+        "dev:backend": "cd packages/backend && pnpm start",
+        "dev:frontend": "cd packages/frontend && pnpm dev",
+        "dev": "pnpm build-backend && concurrently \"pnpm dev:backend\" \"pnpm dev:frontend\""
+    },
+    "devDependencies": {
+        "concurrently": "^9.2.1"
     }
 }

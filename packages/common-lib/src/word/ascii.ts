@@ -1,3 +1,3 @@
-export const parseAscii = (word: string) => word.replace(/ee/g, 'q').replace(/oo/g, 'w').replace(/sh/g, 'j');
+export const parseAscii = (word: string) => word.replaceAll('ee', 'q').replaceAll('oo', 'w').replaceAll('sh', 'j');
 
-export const toAscii = (word: string) => word.replace(/q/g, 'ee').replace(/w/g, 'oo').replace(/j/g, 'sh');
+export const toAscii = (word: string) => word.replaceAll('q', 'ee').replaceAll('w', 'oo').replaceAll('j', 'sh');

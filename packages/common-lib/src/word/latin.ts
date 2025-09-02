@@ -1,4 +1,4 @@
 export const parseLatin = (word: string) =>
-    word.replace(/ə/g, 'q').replace(/ɔ/g, 'w').replace(/ʃ/g, 'j').replace(/ɪ/g, 'i').replace(/ø/g, 'y');
+    word.replaceAll('ə', 'q').replaceAll('ɔ', 'w').replaceAll('ʃ', 'j').replaceAll('ɪ', 'i').replaceAll('ø', 'y');
 export const toLatin = (word: string) =>
-    word.replace(/q/g, 'ə').replace(/w/g, 'ɔ').replace(/j/g, 'ʃ').replace(/i/g, 'ɪ').replace(/y/g, 'ø');
+    word.replaceAll('q', 'ə').replaceAll('w', 'ɔ').replaceAll('j', 'ʃ').replaceAll('i', 'ɪ').replaceAll('y', 'ø');

@@ -19,7 +19,7 @@ createApi<WordFindReq, WordFindRes>('/word/find', async (req, res) => {
 
         try {
             const data = await findWord(req.body.word);
-            succeed(res, { data });
+            succeed(res, data);
         } catch (e) {
             if (e instanceof FindWordError) {
                 return fail(res, 'not_exists');

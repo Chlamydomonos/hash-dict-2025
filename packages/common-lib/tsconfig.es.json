@@ -2,7 +2,7 @@
     "compilerOptions": {
         "incremental": true,
         "tsBuildInfoFile": "dist/es/.tsbuildinfo",
-        "target": "es2016",
+        "target": "esnext",
         "module": "esnext",
         "moduleResolution": "node",
         "rootDir": "./src",
@@ -14,7 +14,8 @@
         "allowSyntheticDefaultImports": true,
         "forceConsistentCasingInFileNames": true,
         "strict": true,
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "lib": ["ESNext"]
     },
     "include": ["src/**/*"],
     "exclude": ["dist", "node_modules"]

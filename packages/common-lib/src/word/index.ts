@@ -13,6 +13,8 @@ export enum WordFormat {
     CHINESE = 'chinese',
 }
 
+export const formats = [WordFormat.ASCII, WordFormat.LATIN, WordFormat.NUM, WordFormat.ASCII_NUM, WordFormat.CHINESE];
+
 /**
  * 检查一个单词的格式。该函数只会返回单词可能的格式，不会检查单词是否合法。
  */
@@ -46,12 +48,16 @@ export const toDB = (word: string) => {
     switch (format) {
         case WordFormat.LATIN:
             result = parseLatin(word);
+            break;
         case WordFormat.CHINESE:
             result = parseChinese(word);
+            break;
         case WordFormat.NUM:
             result = parseNum(word);
+            break;
         case WordFormat.ASCII_NUM:
             result = parseAsciiNum(word);
+            break;
         default:
             result = parseAscii(word);
     }

@@ -2,7 +2,7 @@
     "compilerOptions": {
         "incremental": true,
         "tsBuildInfoFile": "dist/commonjs/.tsbuildinfo",
-        "target": "es2016",
+        "target": "esnext",
         "module": "commonjs",
         "rootDir": "./src",
         "declaration": true,
@@ -13,7 +13,8 @@
         "allowSyntheticDefaultImports": true,
         "forceConsistentCasingInFileNames": true,
         "strict": true,
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "lib": ["ESNext"]
     },
     "include": ["src/**/*"],
     "exclude": ["dist", "node_modules"]

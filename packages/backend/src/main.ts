@@ -10,6 +10,8 @@ import { base128ToNum, toBase128 } from 'common-lib/base128';
 import { scheduleHourlyCheck } from './word/get-daily-words';
 
 const app = express();
+app.use(express.json());
+
 globalThis.app = app;
 globalThis.db = db;
 

@@ -3,7 +3,7 @@ import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios';
 import type { {{ name }}Req, {{ name }}Res } from 'common-lib/api/{{& path }}';
 {{/ meta }}
 
-type ReqDict = {
+export type ReqDict = {
 {{# meta }}
     '/{{& path }}': { req: {{ name }}Req; res: {{ name }}Res };
 {{/ meta }}

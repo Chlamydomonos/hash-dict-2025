@@ -20,7 +20,11 @@ export const findWord = async (word: string) => {
     }
 
     return await db.transaction(async (transaction) => {
-        const type = await Type.findOne({ where: { end: wordType }, transaction });
+        const type = await Type.findOne({
+            where: { end: wordType },
+            attributes: ['id', 'end'],
+            transaction,
+        });
 
         if (!type) {
             throw new FindWordError();
@@ -39,7 +43,7 @@ export const findWord = async (word: string) => {
                         typeId: type.id,
                         parentId,
                     },
-                    sql`'${word}' like concat(${sql.attribute('value')}, '%')`,
+                    sql`${word} like concat(${sql.attribute('value')}, '%')`,
                 ],
                 attributes: ['id', 'value'],
                 transaction,
@@ -54,6 +58,6 @@ export const findWord = async (word: string) => {
             parentId = category.id as number;
         }
 
-        return categories;
+        return { type, categories };
     });
 };
