@@ -9,7 +9,21 @@
             <ElLink class="user-link" underline="never" :icon="User" @click="showUserMenu = !showUserMenu" />
         </div>
     </div>
-    <div class="user-menu" ref="userMenu" :hidden="!showUserMenu">temp</div>
+    <div class="user-menu" ref="userMenu" :hidden="!showUserMenu">
+        <template v-if="loggedIn">
+            <div>
+                <ElIcon><User /></ElIcon>
+                &nbsp;
+                {{ userName }}
+            </div>
+            <div><ElLink @click="logout">登出</ElLink></div>
+        </template>
+        <template v-else>
+            <div>未登录</div>
+            <div><RouterLink to="/login">登录</RouterLink></div>
+            <div><RouterLink to="/register">注册</RouterLink></div>
+        </template>
+    </div>
     <div>
         <RouterView />
     </div>
@@ -18,9 +32,13 @@
 <script lang="ts" setup>
 import SearchBar from '@/components/SearchBar.vue';
 import ThemeSwitch from '@/components/ThemeSwitch.vue';
+import { myAlert } from '@/lib/my-alert';
+import { request } from '@/lib/request';
+import { useSessionStore } from '@/stores/session';
 import { User } from '@element-plus/icons-vue';
-import { ElLink } from 'element-plus';
-import { onBeforeMount, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { ElIcon, ElLink } from 'element-plus';
+import { storeToRefs } from 'pinia';
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 const showUserMenu = ref(false);
 
@@ -52,6 +70,29 @@ onBeforeUnmount(() => {
         resizeObserver.unobserve(siteHeader.value);
     }
 });
+
+const { loggedIn, userName, passwordHash, sessionToken } = storeToRefs(useSessionStore());
+
+const logout = async () => {
+    if (!sessionToken.value) {
+        return;
+    }
+
+    try {
+        const response = (await request('/user/logout', { sessionToken: sessionToken.value })).data;
+        if (response.success) {
+            loggedIn.value = false;
+            userName.value = undefined;
+            passwordHash.value = undefined;
+            sessionToken.value = undefined;
+            myAlert.success('登出成功');
+        } else {
+            myAlert.error('登出失败：未知错误');
+        }
+    } catch (e) {
+        myAlert.error('登出失败：网络错误');
+    }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -98,5 +139,20 @@ onBeforeUnmount(() => {
     right: 4px;
     border: 1px solid var(--el-border-color);
     border-radius: 4px;
+
+    > div {
+        padding: 4px;
+        &:not(:last-child) {
+            border-bottom: 1px solid var(--el-border-color);
+        }
+
+        a {
+            color: var(--el-text-color-regular);
+
+            &:hover {
+                color: var(--el-text-color-primary);
+            }
+        }
+    }
 }
 </style>

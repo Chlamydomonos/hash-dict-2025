@@ -61,11 +61,11 @@ const setCardTop = () => {
 
 onMounted(() => {
     setCardTop();
-    window.onresize = setCardTop;
+    window.addEventListener('resize', setCardTop);
 });
 
 onBeforeUnmount(() => {
-    window.onresize = null;
+    window.removeEventListener('resize', setCardTop);
 });
 
 const rules = reactive<FormRules<Form>>({
@@ -139,8 +139,8 @@ const handleRegister = async () => {
             ).data;
 
             if (response.success) {
-                myAlert.success('注册成功，请等待管理员审核账号');
-                router.push('/login');
+                myAlert.success.next('注册成功，请等待管理员审核账号');
+                await router.push('/login');
                 return;
             }
 

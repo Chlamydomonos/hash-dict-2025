@@ -18,8 +18,8 @@ import { ref } from 'vue';
 
 const searchValue = ref('');
 
-const search = () => {
-    router.push({ name: 'search', params: { word: searchValue.value } });
+const search = async () => {
+    await router.push({ name: 'search', params: { word: searchValue.value } });
 };
 </script>
 

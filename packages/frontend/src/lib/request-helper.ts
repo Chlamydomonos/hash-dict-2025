@@ -53,7 +53,7 @@ export const loginRequest = async <T extends keyof LoginReqDict>(
         if (newRes.data.success || newRes.data.reason != 'not_logged_in') {
             return newRes;
         }
-
-        throw new NotLoggedInError();
     }
+
+    throw new NotLoggedInError();
 };

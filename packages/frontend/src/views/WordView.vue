@@ -6,7 +6,7 @@ import { computed } from 'vue';
 
 const props = defineProps({
     format: {
-        type: {} as () => Exclude<WordFormat, WordFormat.DB>,
+        type: String as () => Exclude<WordFormat, WordFormat.DB>,
         required: true,
     },
     type: {

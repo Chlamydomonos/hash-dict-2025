@@ -59,11 +59,11 @@ const setCardTop = () => {
 
 onMounted(() => {
     setCardTop();
-    window.onresize = setCardTop;
+    window.addEventListener('resize', setCardTop);
 });
 
 onBeforeUnmount(() => {
-    window.onresize = null;
+    window.removeEventListener('resize', setCardTop);
 });
 
 const rules = reactive<FormRules<Form>>({
@@ -106,8 +106,8 @@ const handleLogin = async () => {
                 sessionStore.sessionToken = response.sessionToken;
                 sessionStore.loggedIn = true;
 
-                myAlert.success('登录成功');
-                router.push('/');
+                myAlert.success.next('登录成功');
+                await router.push({ path: '/' });
                 return;
             }
 
