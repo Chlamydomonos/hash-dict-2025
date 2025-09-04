@@ -1,5 +1,5 @@
 # Stage 1: Build stage
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 # Install pnpm
 RUN npm install -g pnpm
@@ -20,7 +20,7 @@ RUN pnpm install --frozen-lockfile
 RUN pnpm release
 
 # Stage 2: Production stage
-FROM node:20-alpine AS production
+FROM node:22-alpine AS production
 
 # Create app directory
 WORKDIR /app
