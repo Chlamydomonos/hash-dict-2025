@@ -10,5 +10,5 @@
     },
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "cSpell.words": ["Haʃø", "kramed", "Popconfirm"]
+    "cSpell.words": ["Haʃø", "healthcheck", "kramed", "Popconfirm"]
 }
