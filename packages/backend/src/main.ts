@@ -58,6 +58,10 @@ const main = async () => {
         console.log('创建初始词库');
     }
 
+    app.get('/health', (_req, res) => {
+        res.send('ok');
+    });
+
     app.use(/.*/, (req, res) => {
         console.log(`未处理的请求: ${req.method} ${req.originalUrl}`);
         res.status(404).json({
