@@ -58,7 +58,7 @@ const main = async () => {
         console.log('创建初始词库');
     }
 
-    app.use('*', (req, res) => {
+    app.use(/.*/, (req, res) => {
         console.log(`未处理的请求: ${req.method} ${req.originalUrl}`);
         res.status(404).json({
             error: 'Not Found',
