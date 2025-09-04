@@ -8,7 +8,7 @@
                     </div>
                     <div class="type-separator">/</div>
                     <template v-for="(category, id) in categories" v-bind:key="id">
-                        <ElLink @click="toId(id)">{{ toFormat(category.value, format) }}</ElLink>
+                        <ElLink @click="toId(id)">{{ genCategory(category, id) }}</ElLink>
                         <div class="category-separator" v-if="id != categories.length - 1">/</div>
                     </template>
                 </div>
@@ -54,7 +54,8 @@
         <div class="content-container">
             <ElSkeleton :throttle="300" :loading="descriptionLoading">
                 <template #default>
-                    <div class="error-text" v-if="description === undefined">Error</div>
+                    <div v-if="descriptionLoading"></div>
+                    <div class="error-text" v-else-if="description === undefined">Error</div>
                     <MarkdownComponent v-else-if="!editing" :text="description" />
                     <ElInput type="textarea" :rows="10" v-else v-model="editingText" />
                 </template>
@@ -395,6 +396,14 @@ useTitle(
     () => `${fullWord.value} | 哈希语词典`,
     () => [props.type.id, props.categories[props.categories.length - 1]?.id],
 );
+
+const genCategory = (category: { id: number; value: string }, id: number) => {
+    let value = category.value;
+    if (id == 0 && value.startsWith('b')) {
+        value = value.slice(1);
+    }
+    return toFormat(value, props.format);
+};
 </script>
 
 <style lang="scss" scoped>

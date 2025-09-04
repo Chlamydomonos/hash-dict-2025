@@ -42,7 +42,8 @@
         <div class="content-container">
             <ElSkeleton :throttle="300" :loading="descriptionLoading">
                 <template #default>
-                    <div class="error-text" v-if="description === undefined">Error</div>
+                    <div v-if="descriptionLoading"></div>
+                    <div class="error-text" v-else-if="description === undefined">Error</div>
                     <MarkdownComponent v-else-if="!editing" :text="description" />
                     <ElInput type="textarea" :rows="10" v-else v-model="editingText" />
                 </template>
