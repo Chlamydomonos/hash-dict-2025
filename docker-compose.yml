@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+    # PostgreSQL Database
+    postgres:
+        image: postgres:15-alpine
+        container_name: hash-dict-postgres
+        environment:
+            POSTGRES_DB: hash_dict
+            POSTGRES_USER: hash_dict_user
+            POSTGRES_PASSWORD: hash_dict_password
+        volumes:
+            - ./data:/var/lib/postgresql/data
+        expose:
+            - 5432
+        restart: unless-stopped
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U hash_dict_user -d hash_dict']
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    # Backend Service
+    backend:
+        build:
+            context: .
+            dockerfile: packages/backend/Dockerfile
+        container_name: hash-dict-backend
+        environment:
+            # PostgreSQL connection settings
+            POSTGRES_HOST: postgres
+            POSTGRES_PORT: 5432
+            POSTGRES_DATABASE: hash_dict
+            POSTGRES_USER: hash_dict_user
+            POSTGRES_PASSWORD: hash_dict_password
+            # Application settings
+            NODE_ENV: production
+            PORT: 3000
+        expose:
+            - 3000
+        depends_on:
+            postgres:
+                condition: service_healthy
+        restart: unless-stopped
+        healthcheck:
+            test:
+                [
+                    'CMD',
+                    'node',
+                    '-e',
+                    "require('http').get('http://localhost:3000/api/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))",
+                ]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 40s
+
+    # Frontend Service
+    frontend:
+        build:
+            context: .
+            dockerfile: packages/frontend/Dockerfile
+        container_name: hash-dict-frontend
+        ports:
+            - '8984:80'
+        depends_on:
+            - backend
+        restart: unless-stopped
+        healthcheck:
+            test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost/']
+            interval: 30s
+            timeout: 10s
+            retries: 3
+
+networks:
+    default:
+        name: hash-dict-network
