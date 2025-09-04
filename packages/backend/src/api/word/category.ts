@@ -9,6 +9,6 @@ createApi<WordCategoryReq, WordCategoryRes>('/word/category', async (req, res) =
         if (!category) {
             return fail(res, 'not_exists');
         }
-        succeed(res, category);
+        succeed(res, category.dataValues);
     });
 });

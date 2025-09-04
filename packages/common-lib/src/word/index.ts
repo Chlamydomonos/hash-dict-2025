@@ -13,7 +13,13 @@ export enum WordFormat {
     CHINESE = 'chinese',
 }
 
-export const formats = [WordFormat.ASCII, WordFormat.LATIN, WordFormat.NUM, WordFormat.ASCII_NUM, WordFormat.CHINESE];
+export const formats = [
+    WordFormat.ASCII,
+    WordFormat.LATIN,
+    WordFormat.NUM,
+    WordFormat.ASCII_NUM,
+    WordFormat.CHINESE,
+] as Exclude<WordFormat, WordFormat.DB>[];
 
 /**
  * 检查一个单词的格式。该函数只会返回单词可能的格式，不会检查单词是否合法。

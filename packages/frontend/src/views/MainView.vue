@@ -16,7 +16,9 @@
                 &nbsp;
                 {{ userName }}
             </div>
-            <div><ElLink @click="logout">登出</ElLink></div>
+            <div><RouterLink to="/edit-user">编辑用户信息</RouterLink></div>
+            <div><RouterLink to="/admin">管理员页面</RouterLink></div>
+            <div><ElLink @click="logout" underline="never">登出</ElLink></div>
         </template>
         <template v-else>
             <div>未登录</div>
@@ -139,6 +141,7 @@ const logout = async () => {
     right: 4px;
     border: 1px solid var(--el-border-color);
     border-radius: 4px;
+    background-color: var(--el-bg-color);
 
     > div {
         padding: 4px;
@@ -148,6 +151,8 @@ const logout = async () => {
 
         a {
             color: var(--el-text-color-regular);
+            font-size: var(--el-font-size-base);
+            text-decoration: none;
 
             &:hover {
                 color: var(--el-text-color-primary);

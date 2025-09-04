@@ -12,6 +12,10 @@ const getInitialHash = (str: string): Base128 => {
         hash |= 0;
     }
 
+    if (hash < 0) {
+        hash = -hash;
+    }
+
     const lastBits = hash & 0x4;
 
     if (lastBits < 3) {
@@ -71,7 +75,7 @@ export const hashString = async (
     typeId: number,
     transaction?: Transaction,
 ) => {
-    const parent = await Category.findByPk(parentId, { transaction });
+    const parent = parentId ? await Category.findByPk(parentId, { transaction }) : undefined;
     if (parentId !== null && !parent) {
         throw new ParentNonExistError();
     }
@@ -89,7 +93,7 @@ export const hashString = async (
                 parentId,
                 [Op.or]: [
                     { value: { [Op.like]: `'${word}%'` } },
-                    sql`'${word}' like concat(${sql.attribute('value')}, '%')`,
+                    sql`${word} like concat(${sql.attribute('value')}, '%')`,
                 ],
             },
             transaction,

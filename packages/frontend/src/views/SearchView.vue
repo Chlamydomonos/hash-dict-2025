@@ -8,6 +8,7 @@
 <script lang="ts" setup>
 import { myAlert } from '@/lib/my-alert';
 import { request } from '@/lib/request';
+import { useTitle } from '@/lib/use-title';
 import router from '@/router';
 import { useThemeStore } from '@/stores/theme';
 import { checkFormat, toDB } from 'common-lib/word/index';
@@ -61,6 +62,8 @@ onMounted(async () => {
         router.back();
     }
 });
+
+useTitle(() => `搜索：${props.word} | 哈希语词典`);
 </script>
 
 <style lang="scss" scoped>

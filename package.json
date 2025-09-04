@@ -7,7 +7,8 @@
         "backend": "pnpm build-backend && cd packages/backend && pnpm start",
         "dev:backend": "cd packages/backend && pnpm start",
         "dev:frontend": "cd packages/frontend && pnpm dev",
-        "dev": "pnpm build-backend && concurrently \"pnpm dev:backend\" \"pnpm dev:frontend\""
+        "dev": "pnpm build-backend && concurrently \"pnpm dev:backend\" \"pnpm dev:frontend\"",
+        "release": "cd packages/common-lib && pnpm release && cd ../codegen-tool && pnpm build && pnpm start && cd ../backend && pnpm build:release && cd ../frontend && pnpm build"
     },
     "devDependencies": {
         "concurrently": "^9.2.1"

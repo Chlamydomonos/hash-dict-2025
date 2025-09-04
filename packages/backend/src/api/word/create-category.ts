@@ -33,7 +33,7 @@ createApi<WordCreateCategoryReq, WordCreateCategoryRes>('/word/create-category',
                 return fail(res, 'type_not_exists');
             }
 
-            const parent = await Category.findByPk(parentId, { transaction });
+            const parent = parentId ? await Category.findByPk(parentId, { transaction }) : undefined;
             if (parentId !== null && !parent) {
                 return fail(res, 'parent_not_exists');
             }
@@ -53,7 +53,7 @@ createApi<WordCreateCategoryReq, WordCreateCategoryRes>('/word/create-category',
                     parentId,
                     [Op.or]: [
                         { value: { [Op.like]: `${value}%` } },
-                        sql`'${value}' like concat(${(sql.attribute('value'), '%')})`,
+                        sql`${value} like concat(${sql.attribute('value')}, '%')`,
                     ],
                 },
                 attributes: ['value'],
@@ -75,9 +75,11 @@ createApi<WordCreateCategoryReq, WordCreateCategoryRes>('/word/create-category',
             );
             if (isReserved) {
                 if (parent) {
-                    await parent.update('lastReserved', value, { transaction });
+                    parent.lastReserved = value;
+                    await parent.save({ transaction });
                 } else {
-                    await type.update('lastReserved', value, { transaction });
+                    type.lastReserved = value;
+                    await type.save({ transaction });
                 }
             }
             succeed(res, { id: newCategory.id });

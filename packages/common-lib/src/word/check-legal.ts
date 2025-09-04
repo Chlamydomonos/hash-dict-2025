@@ -26,4 +26,6 @@ export const checkLegal = (word: string) => {
             return false;
         }
     }
+
+    return true;
 };

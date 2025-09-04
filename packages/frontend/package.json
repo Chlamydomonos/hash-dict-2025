@@ -20,6 +20,7 @@
         "axios": "^1.11.0",
         "common-lib": "workspace:*",
         "element-plus": "^2.11.1",
+        "kramed": "^0.5.6",
         "pinia": "^3.0.3",
         "pinia-plugin-persistedstate": "^4.5.0",
         "sass": "^1.91.0",
@@ -28,6 +29,7 @@
     },
     "devDependencies": {
         "@tsconfig/node22": "^22.0.2",
+        "@types/kramed": "^0.5.5",
         "@types/node": "^22.16.5",
         "@vitejs/plugin-vue": "^6.0.1",
         "@vue/eslint-config-prettier": "^10.2.0",

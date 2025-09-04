@@ -1,7 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { wordRoute } from './word';
+import { typeRoute } from './type';
 import { useNextAlertStore } from '@/stores/next-alert';
 import { ElMessage } from 'element-plus';
+import { createCategoryRoute } from './create-category';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -33,6 +35,24 @@ const router = createRouter({
                     component: () => import('@/views/HomeView.vue'),
                 },
                 wordRoute,
+                typeRoute,
+                createCategoryRoute,
+                {
+                    path: 'create-type/:format',
+                    name: 'create-type',
+                    component: () => import('@/views/CreateTypeView.vue'),
+                    props: true,
+                },
+                {
+                    path: 'admin',
+                    name: 'admin',
+                    component: () => import('@/views/AdminView.vue'),
+                },
+                {
+                    path: 'edit-user',
+                    name: 'edit-user',
+                    component: () => import('@/views/EditUserView.vue'),
+                },
             ],
         },
     ],

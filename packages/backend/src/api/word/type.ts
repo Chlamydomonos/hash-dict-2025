@@ -10,6 +10,6 @@ createApi<WordTypeReq, WordTypeRes>('/word/type', async (req, res) => {
         if (!type) {
             return fail(res, 'not_exists');
         }
-        succeed(res, type);
+        succeed(res, type.dataValues);
     });
 });

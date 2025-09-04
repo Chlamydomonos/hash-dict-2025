@@ -13,7 +13,7 @@ createApi<WordCountReq, WordCountRes>('/word/count', async (req, res) => {
                 return fail(res, 'type_not_exists');
             }
 
-            const parent = await Category.findByPk(parentId, { transaction });
+            const parent = parentId ? await Category.findByPk(parentId, { transaction }) : undefined;
             if (parentId !== null && !parent) {
                 return fail(res, 'parent_not_exists');
             }

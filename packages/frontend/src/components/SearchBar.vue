@@ -1,5 +1,5 @@
 <template>
-    <ElInput v-model="searchValue" size="small" class="search-bar">
+    <ElInput v-model="searchValue" size="small" class="search-bar" @keyup.enter="search">
         <template #append>
             <ElButton size="small" @click="search">
                 <template #icon>
@@ -19,6 +19,10 @@ import { ref } from 'vue';
 const searchValue = ref('');
 
 const search = async () => {
+    if (searchValue.value == '') {
+        return;
+    }
+
     await router.push({ name: 'search', params: { word: searchValue.value } });
 };
 </script>

@@ -13,7 +13,7 @@ createApi<WordListReq, WordListRes>('/word/list', async (req, res) => {
                 return fail(res, 'type_not_exists');
             }
 
-            const parent = await Category.findByPk(parentId, { transaction });
+            const parent = parentId ? await Category.findByPk(parentId, { transaction }) : undefined;
             if (parentId !== null && !parent) {
                 return fail(res, 'parent_not_exists');
             }
@@ -26,7 +26,7 @@ createApi<WordListReq, WordListRes>('/word/list', async (req, res) => {
                 offset: start,
             });
 
-            succeed(res, { data });
+            succeed(res, { data: data.map((c) => ({ id: c.id, value: c.value })) });
         });
     });
 });

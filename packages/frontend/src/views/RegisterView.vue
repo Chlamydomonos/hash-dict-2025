@@ -29,6 +29,7 @@
 import ThemeSwitch from '@/components/ThemeSwitch.vue';
 import { myAlert } from '@/lib/my-alert';
 import { request } from '@/lib/request';
+import { useTitle } from '@/lib/use-title';
 import router from '@/router';
 import { sha256 } from 'common-lib/api-lib/sha256';
 import { ElButton, ElCard, ElForm, ElFormItem, ElInput, ElRow, type FormInstance, type FormRules } from 'element-plus';
@@ -155,6 +156,8 @@ const handleRegister = async () => {
         }
     });
 };
+
+useTitle('注册 | 哈希语词典');
 </script>
 
 <style lang="scss" scoped>

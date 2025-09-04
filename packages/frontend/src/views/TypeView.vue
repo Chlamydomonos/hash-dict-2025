@@ -1,18 +1,7 @@
 <template>
     <div class="outer-frame">
-        <div class="word-header">
-            <ElScrollbar>
-                <div class="chain-container">
-                    <div class="type-container">
-                        <ElLink @click="toType">{{ type.end == '' ? '_' : toFormat(type.end, format) }}</ElLink>
-                    </div>
-                    <div class="type-separator">/</div>
-                    <template v-for="(category, id) in categories" v-bind:key="id">
-                        <ElLink @click="toId(id)">{{ toFormat(category.value, format) }}</ElLink>
-                        <div class="category-separator" v-if="id != categories.length - 1">/</div>
-                    </template>
-                </div>
-            </ElScrollbar>
+        <div class="type-header">
+            <div class="type-display">类型: {{ type.end == '' ? '_' : toFormat(type.end, format) }}</div>
         </div>
         <div class="format-container">
             <ElFormItem label="格式:" class="format-selection">
@@ -25,7 +14,7 @@
                     />
                 </ElSelect>
             </ElFormItem>
-            <ElPopconfirm title="确认删除？该单词的所有子类也会被删除" @confirm="handleDelete" :icon="WarningFilled">
+            <ElPopconfirm title="确认删除？该类别的所有单词也会被删除" @confirm="handleDelete" :icon="WarningFilled">
                 <template #reference>
                     <ElButton size="small" type="danger" v-if="loggedIn">
                         <template #icon><Delete /></template>
@@ -41,9 +30,8 @@
                 </template>
             </ElPopconfirm>
         </div>
-        <div class="word">{{ fullWord }}</div>
         <div class="titles-container">
-            <div class="title">释义</div>
+            <div class="title">描述</div>
             <ElButton v-if="loggedIn" size="small" @click="toggleEdit">
                 <template #icon>
                     <Edit v-if="!editing" />
@@ -62,7 +50,7 @@
         </div>
         <div class="titles-container">
             <div class="title">子类</div>
-            <ElButton v-if="loggedIn" size="small" @click="toCreate">
+            <ElButton v-if="loggedIn" size="small" @click="toCreateCategory">
                 <template #icon><Plus /></template>
             </ElButton>
         </div>
@@ -100,7 +88,7 @@ import { loginRequest, NotLoggedInError } from '@/lib/request-helper';
 import { useTitle } from '@/lib/use-title';
 import router from '@/router';
 import { useSessionStore } from '@/stores/session';
-import { CircleCheck, Delete, Edit, Plus, WarningFilled, Close, Check } from '@element-plus/icons-vue';
+import { Check, CircleCheck, Close, Delete, Edit, Plus, WarningFilled } from '@element-plus/icons-vue';
 import { formats, toFormat, WordFormat } from 'common-lib/word/index';
 import {
     ElButton,
@@ -109,13 +97,12 @@ import {
     ElInput,
     ElLink,
     ElOption,
-    ElScrollbar,
+    ElPopconfirm,
     ElSelect,
     ElSkeleton,
-    ElPopconfirm,
 } from 'element-plus';
 import { storeToRefs } from 'pinia';
-import { computed, onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 
 const props = defineProps({
     format: {
@@ -126,43 +113,18 @@ const props = defineProps({
         type: {} as () => { id: number; end: string },
         required: true,
     },
-    categories: {
-        type: {} as () => { id: number; value: string }[],
-        required: true,
-    },
 });
 
 const selectedFormat = ref(props.format);
 
 const routeFormat = async () => {
     await router.replace({
-        name: 'word',
-        params: buildWordParams({
-            ...props,
+        name: 'type',
+        params: {
             format: selectedFormat.value,
-        }),
-    });
-};
-
-const fullWord = computed(() => {
-    let word = '';
-    for (const category of props.categories) {
-        word += category.value;
-    }
-    word += props.type.end;
-    if (word.startsWith('b')) {
-        word = word.slice(1);
-    }
-    return toFormat(word, props.format);
-});
-
-const toId = async (id: number) => {
-    await router.push({
-        name: 'word',
-        params: buildWordParams({
-            ...props,
-            categories: props.categories.slice(0, id + 1),
-        }),
+            typeId: props.type.id,
+            type: props.type.end == '' ? '0' : props.type.end,
+        },
     });
 };
 
@@ -175,8 +137,7 @@ const loadDescription = async () => {
     descriptionLoading.value = true;
     description.value = undefined;
     try {
-        const lastCategory = props.categories[props.categories.length - 1];
-        const response = (await request('/word/category', { id: lastCategory.id })).data;
+        const response = (await request('/word/type', { id: props.type.id })).data;
         descriptionLoading.value = false;
         if (response.success) {
             description.value = response.description;
@@ -184,14 +145,14 @@ const loadDescription = async () => {
         } else {
             switch (response.reason) {
                 case 'not_exists':
-                    myAlert.error('加载释义失败：单词不存在');
+                    myAlert.error('加载描述失败：类型不存在');
                     return;
                 default:
-                    myAlert.error('加载释义失败：未知错误');
+                    myAlert.error('加载描述失败：未知错误');
             }
         }
     } catch (e) {
-        myAlert.error('加载释义失败：网络错误');
+        myAlert.error('加载描述失败：网络错误');
         descriptionLoading.value = false;
     }
 };
@@ -208,7 +169,7 @@ const loadPage = async (pageId: number) => {
         const res = (
             await request('/word/list', {
                 typeId: props.type.id,
-                parentId: props.categories[props.categories.length - 1].id,
+                parentId: null,
                 start: (pageId - 1) * 20,
                 limit: 20,
             })
@@ -225,7 +186,7 @@ const loadPage = async (pageId: number) => {
                     myAlert.error('加载子类失败：类型不存在');
                     return;
                 case 'parent_not_exists':
-                    myAlert.error('加载子类失败：单词不存在');
+                    myAlert.error('加载子类失败：父类不存在');
                     return;
                 default:
                     myAlert.error('加载子类失败：未知错误');
@@ -246,7 +207,7 @@ const loadPageCount = async () => {
         const res = (
             await request('/word/count', {
                 typeId: props.type.id,
-                parentId: props.categories[props.categories.length - 1].id,
+                parentId: null,
             })
         ).data;
 
@@ -259,7 +220,7 @@ const loadPageCount = async () => {
                     myAlert.error('加载子类失败：类型不存在');
                     return;
                 case 'parent_not_exists':
-                    myAlert.error('加载子类失败：单词不存在');
+                    myAlert.error('加载子类失败：父类不存在');
                     return;
                 default:
                     myAlert.error('加载子类失败：未知错误');
@@ -277,12 +238,7 @@ const loadPageCount = async () => {
 };
 
 const buildChild = (value: string) => {
-    let word = '';
-    for (const category of props.categories) {
-        word += category.value;
-    }
-    word += value;
-    word += props.type.end;
+    let word = value + props.type.end;
     if (word.startsWith('b')) {
         word = word.slice(1);
     }
@@ -293,14 +249,15 @@ const toChild = async (child: { id: number; value: string }) => {
     await router.push({
         name: 'word',
         params: buildWordParams({
-            ...props,
-            categories: [...props.categories, child],
+            format: props.format,
+            type: props.type,
+            categories: [child],
         }),
     });
 };
 
 watch(
-    () => [props.type.id, props.categories[props.categories.length - 1]?.id],
+    () => props.type.id,
     async () => {
         await Promise.all([loadDescription(), loadPageCount()]);
     },
@@ -311,10 +268,14 @@ onMounted(async () => {
     await Promise.all([loadDescription(), loadPageCount()]);
 });
 
-const toCreate = async () => {
+const toCreateCategory = async () => {
     await router.push({
         name: 'create-category',
-        params: buildWordParams(props),
+        params: {
+            format: props.format,
+            typeId: props.type.id,
+            type: props.type.end == '' ? '0' : props.type.end,
+        },
     });
 };
 
@@ -330,8 +291,8 @@ const toggleEdit = async () => {
 
     try {
         const response = (
-            await loginRequest('/word/edit-category', {
-                id: props.categories[props.categories.length - 1].id,
+            await loginRequest('/word/edit-type', {
+                id: props.type.id,
                 description: editingText.value,
             })
         ).data;
@@ -344,7 +305,8 @@ const toggleEdit = async () => {
 
         switch (response.reason) {
             case 'not_exists':
-                myAlert.error('编辑失败：单词不存在');
+                myAlert.error('编辑失败：类型不存在');
+                break;
             default:
                 myAlert.error('编辑失败：未知错误');
         }
@@ -357,21 +319,11 @@ const toggleEdit = async () => {
     }
 };
 
-const toType = async () => {
-    await router.push({
-        name: 'type',
-        params: {
-            typeId: props.type.id,
-            type: props.type.end == '' ? '0' : props.type.end,
-        },
-    });
-};
-
 const handleDelete = async () => {
     try {
         const response = (
-            await loginRequest('/word/delete-category', {
-                id: props.categories[props.categories.length - 1].id,
+            await loginRequest('/word/delete-type', {
+                id: props.type.id,
             })
         ).data;
 
@@ -384,16 +336,16 @@ const handleDelete = async () => {
         myAlert.error('删除失败：未知错误');
     } catch (e) {
         if (e instanceof NotLoggedInError) {
-            myAlert.error('删除单词失败：未登录');
+            myAlert.error('删除类型失败：未登录');
         } else {
-            myAlert.error('删除单词失败：网络错误');
+            myAlert.error('删除类型失败：网络错误');
         }
     }
 };
 
 useTitle(
-    () => `${fullWord.value} | 哈希语词典`,
-    () => [props.type.id, props.categories[props.categories.length - 1]?.id],
+    () => `类别：${props.type.end == '' ? '_' : toFormat(props.type.end, props.format)} | 哈希语词典`,
+    () => props.type.id,
 );
 </script>
 
@@ -405,52 +357,20 @@ useTitle(
     border-radius: 4px;
 }
 
-.word-header {
+.type-header {
     border-bottom: 1px solid var(--el-border-color);
-    padding: 0.2em;
+    padding: 1em;
 }
 
-.chain-container {
-    display: flex;
-    width: fit-content;
-}
-
-.type-container {
-    display: inline-flex;
-    align-items: center;
-    margin: 0.1em;
-    padding: 0 0.2em;
-    background-color: var(--el-color-info-light-7);
-    border-radius: 2px;
-    * {
-        font-weight: bold;
-    }
-}
-
-.type-separator {
-    display: inline-flex;
-    align-items: center;
-    margin: 0 0.5em;
+.type-display {
+    font-size: large;
     font-weight: bold;
-    color: var(--el-color-info);
-}
-
-.category-separator {
-    display: inline-flex;
-    align-items: center;
-    margin: 0 0.2em;
+    text-align: center;
 }
 
 .format-selection {
     padding: 0.25em;
     width: 200px;
-}
-
-.word {
-    padding: 0.5em;
-    font-size: large;
-    font-weight: bold;
-    text-align: center;
 }
 
 .titles-container {

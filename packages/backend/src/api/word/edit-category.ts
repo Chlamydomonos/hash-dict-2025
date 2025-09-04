@@ -15,7 +15,9 @@ createApi<WordEditCategoryReq, WordEditCategoryRes>('/word/edit-category', async
             if (!category) {
                 return fail(res, 'not_exists');
             }
-            await category.update('description', description, { transaction });
+
+            category.description = description;
+            await category.save({ transaction });
             succeed(res);
         });
     });

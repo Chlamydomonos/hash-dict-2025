@@ -50,7 +50,7 @@ export const chain = async (
         },
     );
 
-    const data = queryResult[0] as { id: number; value: string }[];
+    const data = queryResult as { id: number; value: string }[];
 
     return { type, data };
 };

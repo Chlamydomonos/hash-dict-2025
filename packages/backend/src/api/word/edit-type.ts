@@ -15,7 +15,9 @@ createApi<WordEditTypeReq, WordEditTypeRes>('/word/edit-type', async (req, res) 
             if (!type) {
                 return fail(res, 'not_exists');
             }
-            await type.update('description', description, { transaction });
+
+            type.description = description;
+            await type.save({ transaction });
             succeed(res);
         });
     });
