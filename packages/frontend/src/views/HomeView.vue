@@ -12,7 +12,7 @@
                 /
                 <RouterLink :to="{ name: 'search', params: { word: '哈希' } }">哈希</RouterLink>
             </div>
-            <div class="title">哈希语词典</div>
+            <div class="title" ref="titleElement">哈希语词典</div>
         </div>
     </div>
     <div class="types-container" v-if="types">
@@ -44,6 +44,7 @@ import { onBeforeUnmount, onMounted, ref } from 'vue';
 
 const mainTitle = ref<HTMLElement>();
 const mainTitleText = ref<HTMLElement>();
+const titleElement = ref<HTMLElement>();
 
 const adjustFontSize = () => {
     let minFontSize = 1;
@@ -70,13 +71,42 @@ const adjustFontSize = () => {
     }
 };
 
+const adjustTitleFontSize = () => {
+    let minFontSize = 1;
+    let maxFontSize = 64; // 4rem = 64px (assuming 1rem = 16px)
+    let fontSize = (minFontSize + maxFontSize) / 2;
+    const maxWidth = window.innerWidth * 0.6; // 60vw
+
+    titleElement.value!.style.fontSize = fontSize + 'px';
+
+    while (maxFontSize - minFontSize > 1) {
+        if (titleElement.value!.offsetWidth < maxWidth) {
+            minFontSize = fontSize;
+        } else {
+            maxFontSize = fontSize;
+        }
+
+        fontSize = (minFontSize + maxFontSize) / 2;
+        titleElement.value!.style.fontSize = fontSize + 'px';
+    }
+
+    if (titleElement.value!.offsetWidth < maxWidth) {
+        titleElement.value!.style.fontSize = maxFontSize + 'px';
+    } else {
+        titleElement.value!.style.fontSize = minFontSize + 'px';
+    }
+};
+
 onMounted(() => {
     adjustFontSize();
+    adjustTitleFontSize();
     window.addEventListener('resize', adjustFontSize);
+    window.addEventListener('resize', adjustTitleFontSize);
 });
 
 onBeforeUnmount(() => {
     window.removeEventListener('resize', adjustFontSize);
+    window.removeEventListener('resize', adjustTitleFontSize);
 });
 
 const types = ref<{ id: number; end: string }[]>();
@@ -193,8 +223,9 @@ useTitle('哈希语词典');
     }
 
     .title {
-        font-size: 4rem;
         font-weight: bold;
+        width: fit-content;
+        margin: 0 auto;
     }
 }
 
