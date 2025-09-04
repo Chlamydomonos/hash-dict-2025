@@ -7,7 +7,7 @@ const getRandomWords = async () => {
         const randomCategories = await Category.findAll({
             attributes: ['id', 'value'],
             order: sql`random()`,
-            limit: 10,
+            limit: 20,
             transaction,
         });
         return await Promise.all(randomCategories.map((c) => chain(c.id, transaction)));
