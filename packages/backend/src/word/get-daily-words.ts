@@ -8,7 +8,7 @@ const getRandomWords = async () => {
         const randomCategories = await (async (): Promise<{ id: number; value: string }[]> => {
             if (process.env.POSTGRES_HOST) {
                 const count = await Category.count({ transaction });
-                return (await db.query(
+                const data = (await db.query(
                     sql`
                         select ${sql.attribute('id')}, ${sql.attribute('value')}
                         from ${sql.identifier(Category)}
@@ -18,6 +18,8 @@ const getRandomWords = async () => {
                     `,
                     { transaction, type: 'SELECT' },
                 )) as { id: number; value: string }[];
+                log('获取Postgres数据:', data);
+                return data;
             } else {
                 return await Category.findAll({
                     attributes: ['id', 'value'],
