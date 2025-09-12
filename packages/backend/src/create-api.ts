@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express';
+import { log, logError } from './log';
 
 export const createApi = <Req, Res>(
     path: string,
@@ -6,10 +7,10 @@ export const createApi = <Req, Res>(
 ) => {
     app.post(path, async (req, res) => {
         try {
-            console.log('POST', path);
+            log('POST', path);
             await handler(req, res);
         } catch (e) {
-            console.log('Unhandled error:', e);
+            logError('Unhandled error:', e);
             res.status(500).send('Internal server error');
         }
     });

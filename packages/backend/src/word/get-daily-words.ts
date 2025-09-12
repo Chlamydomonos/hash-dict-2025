@@ -1,15 +1,32 @@
 import { sql } from '@sequelize/core';
 import { Category } from '../db/models/Category';
 import { chain } from './chain';
+import { log, logError } from '../log';
 
 const getRandomWords = async () => {
     return await db.transaction(async (transaction) => {
-        const randomCategories = await Category.findAll({
-            attributes: ['id', 'value'],
-            order: sql`random()`,
-            limit: 20,
-            transaction,
-        });
+        const randomCategories = await (async (): Promise<{ id: number; value: string }[]> => {
+            if (process.env.POSTGRES_HOST) {
+                const count = await Category.count({ transaction });
+                return (await db.query(
+                    sql`
+                        select ${sql.attribute('id')}, ${sql.attribute('value')}
+                        from ${sql.identifier(Category)}
+                        tablesample system (${Math.min(Math.ceil((40 / count) * 100), 60)})
+                        order by random()
+                        limit 20
+                    `,
+                    { transaction, type: 'SELECT' },
+                )) as { id: number; value: string }[];
+            } else {
+                return await Category.findAll({
+                    attributes: ['id', 'value'],
+                    order: sql`random()`,
+                    limit: 20,
+                    transaction,
+                });
+            }
+        })();
         return await Promise.all(randomCategories.map((c) => chain(c.id, transaction)));
     });
 };
@@ -41,9 +58,9 @@ const updateDailyWords = async (): Promise<void> => {
     try {
         dailyWordsCache = await getRandomWords();
         lastUpdateDate = getTodayDateString();
-        console.log(`每日单词已更新 - ${lastUpdateDate} ${new Date().toLocaleTimeString()}`);
+        log(`每日单词已更新 - ${lastUpdateDate} ${new Date().toLocaleTimeString()}`);
     } catch (error) {
-        console.error('更新每日单词失败:', error);
+        logError('更新每日单词失败:', error);
         throw error;
     }
 };
@@ -55,14 +72,14 @@ export const scheduleHourlyCheck = (): void => {
 
         // 如果缓存为空，直接更新
         if (dailyWordsCache === null) {
-            console.log('缓存为空，立即更新每日单词...');
+            log('缓存为空，立即更新每日单词...');
             await updateDailyWords();
             return;
         }
 
         // 如果是新的一天且已经过了12:00，则更新
         if (lastUpdateDate !== today && isAfterNoon()) {
-            console.log('检测到新的一天且已过12:00，更新每日单词...');
+            log('检测到新的一天且已过12:00，更新每日单词...');
             await updateDailyWords();
         }
     };
@@ -73,7 +90,7 @@ export const scheduleHourlyCheck = (): void => {
     // 每小时执行一次检查
     setInterval(checkAndUpdate, 60 * 60 * 1000); // 1小时 = 60分钟 * 60秒 * 1000毫秒
 
-    console.log('定时检查任务已启动，每小时检查一次是否需要更新每日单词');
+    log('定时检查任务已启动，每小时检查一次是否需要更新每日单词');
 };
 
 export const getDailyWords = async () => {

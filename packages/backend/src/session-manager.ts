@@ -123,7 +123,6 @@ class SessionManager {
                 message: '登录成功',
             };
         } catch (error) {
-            console.error('Login error:', error);
             return {
                 result: LoginResult.INTERNAL_ERROR,
                 message: '服务器内部错误',

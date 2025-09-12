@@ -8,6 +8,7 @@ import { Category } from './db/models/Category';
 import { Type } from './db/models/Type';
 import { base128ToNum, toBase128 } from 'common-lib/base128';
 import { scheduleHourlyCheck } from './word/get-daily-words';
+import { log, logError } from './log';
 
 const app = express();
 app.use(express.json());
@@ -41,7 +42,7 @@ const main = async () => {
             passwordHash: await sha256('123456'),
             valid: true,
         });
-        console.log('创建根用户');
+        log('创建根用户');
     }
 
     if ((await Type.count()) == 0) {
@@ -55,7 +56,7 @@ const main = async () => {
             compareValue: base128ToNum(toBase128('hajy')),
             description: '哈希语',
         });
-        console.log('创建初始词库');
+        log('创建初始词库');
     }
 
     app.get('/health', (_req, res) => {
@@ -63,7 +64,7 @@ const main = async () => {
     });
 
     app.use(/.*/, (req, res) => {
-        console.log(`未处理的请求: ${req.method} ${req.originalUrl}`);
+        logError(`未处理的请求: ${req.method} ${req.originalUrl}`);
         res.status(404).json({
             error: 'Not Found',
             message: `路径 ${req.originalUrl} 不存在`,
@@ -75,7 +76,7 @@ const main = async () => {
     scheduleHourlyCheck();
 
     app.listen(3000, () => {
-        console.log('App listening on 3000');
+        log('App listening on 3000');
     });
 };
 
