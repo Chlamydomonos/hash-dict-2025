@@ -36,6 +36,7 @@ import SearchBar from '@/components/SearchBar.vue';
 import ThemeSwitch from '@/components/ThemeSwitch.vue';
 import { myAlert } from '@/lib/my-alert';
 import { request } from '@/lib/request';
+import router from '@/router';
 import { useSessionStore } from '@/stores/session';
 import { User } from '@element-plus/icons-vue';
 import { ElIcon, ElLink } from 'element-plus';
@@ -95,6 +96,13 @@ const logout = async () => {
         myAlert.error('登出失败：网络错误');
     }
 };
+
+watch(
+    () => router.currentRoute,
+    () => {
+        showUserMenu.value = false;
+    },
+);
 </script>
 
 <style lang="scss" scoped>

@@ -2,6 +2,7 @@ import { sql } from '@sequelize/core';
 import { Category } from '../db/models/Category';
 import { chain } from './chain';
 import { log, logError } from '../log';
+import moment from 'moment-timezone';
 
 const getRandomWords = async () => {
     return await db.transaction(async (transaction) => {
@@ -39,8 +40,7 @@ let lastUpdateDate: string | null = null;
 
 // 获取今天的日期字符串 (YYYY-MM-DD)
 const getTodayDateString = (): string => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
+    return moment().tz('Asia/Shanghai').format('YYYY-MM-DD');
 };
 
 // 检查是否需要更新每日单词
@@ -51,8 +51,8 @@ const shouldUpdateDailyWords = (): boolean => {
 
 // 检查是否在12:00之后（用于判断是否应该更新当天的单词）
 const isAfterNoon = (): boolean => {
-    const now = new Date();
-    return now.getHours() >= 12;
+    const now = moment().tz('Asia/Shanghai');
+    return now.hours() >= 12;
 };
 
 // 更新每日单词缓存
