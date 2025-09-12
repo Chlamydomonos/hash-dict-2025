@@ -15,6 +15,7 @@
         "@sequelize/sqlite3": "7.0.0-alpha.46",
         "common-lib": "workspace:*",
         "express": "^5.1.0",
+        "moment-timezone": "^0.6.0",
         "sqlite3": "^5.1.7"
     },
     "scripts": {

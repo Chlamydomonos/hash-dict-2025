@@ -1,7 +1,13 @@
+import moment from 'moment-timezone';
+
+const getDate = () => {
+    return moment().tz('Asia/Shanghai').format('YYYY-MM-DD HH:mm:ss');
+};
+
 export const log = (...items: any[]) => {
-    console.log(`[${new Date()}]`, ...items);
+    console.log(`[${getDate()}]`, ...items);
 };
 
 export const logError = (...items: any[]) => {
-    console.error(`[ERROR: ${new Date()}]`, ...items);
+    console.error(`[ERROR: ${getDate()}]`, ...items);
 };
