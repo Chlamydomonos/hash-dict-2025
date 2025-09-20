@@ -9,6 +9,11 @@ import { Type } from './db/models/Type';
 import { base128ToNum, toBase128 } from 'common-lib/base128';
 import { scheduleHourlyCheck } from './word/get-daily-words';
 import { log, logError } from './log';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import { EmbeddingClientManager } from './embedding/client-manager';
+import { createChroma } from './embedding';
+import { EmbeddingManager } from './embedding/embedding-manager';
 
 const app = express();
 app.use(express.json());
@@ -32,6 +37,26 @@ const requireAllJsFiles = (dir: string) => {
 };
 
 requireAllJsFiles(apiPath);
+
+app.get('/health', (_req, res) => {
+    res.send('ok');
+});
+
+app.use(/.*/, (req, res) => {
+    logError(`未处理的请求: ${req.method} ${req.originalUrl}`);
+    res.status(404).json({
+        error: 'Not Found',
+        message: `路径 ${req.originalUrl} 不存在`,
+        method: req.method,
+        path: req.originalUrl,
+    });
+});
+
+const httpServer = createServer(app);
+const socketIO = new Server(httpServer, { path: '/socket-io' });
+globalThis.socketIO = socketIO;
+globalThis.embeddingClientManager = new EmbeddingClientManager();
+globalThis.embeddingManager = new EmbeddingManager();
 
 const main = async () => {
     await db.sync();
@@ -59,23 +84,15 @@ const main = async () => {
         log('创建初始词库');
     }
 
-    app.get('/health', (_req, res) => {
-        res.send('ok');
-    });
-
-    app.use(/.*/, (req, res) => {
-        logError(`未处理的请求: ${req.method} ${req.originalUrl}`);
-        res.status(404).json({
-            error: 'Not Found',
-            message: `路径 ${req.originalUrl} 不存在`,
-            method: req.method,
-            path: req.originalUrl,
-        });
-    });
+    try {
+        globalThis.chroma = await createChroma();
+    } catch (e) {
+        logError('ChromaDB未正确连接');
+    }
 
     scheduleHourlyCheck();
 
-    app.listen(3000, () => {
+    httpServer.listen(3000, () => {
         log('App listening on 3000');
     });
 };

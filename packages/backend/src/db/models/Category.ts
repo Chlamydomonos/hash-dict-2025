@@ -41,7 +41,7 @@ export class Category extends Model<InferAttributes<Category>, InferCreationAttr
     declare lastReserved: CreationOptional<string>;
 
     @Attribute(DataTypes.INTEGER)
-    declare vectorId?: number;
+    declare vectorId: number | null;
 
     @Attribute(DataTypes.INTEGER)
     @NotNull

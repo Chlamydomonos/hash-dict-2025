@@ -25,6 +25,12 @@ const router = createRouter({
             props: true,
         },
         {
+            path: '/query/:text',
+            name: 'query',
+            component: () => import('@/views/QueryView.vue'),
+            props: true,
+        },
+        {
             path: '/',
             name: 'main',
             component: () => import('@/views/MainView.vue'),
@@ -52,6 +58,16 @@ const router = createRouter({
                     path: 'edit-user',
                     name: 'edit-user',
                     component: () => import('@/views/EditUserView.vue'),
+                },
+                {
+                    path: 'embedding',
+                    name: 'embedding',
+                    component: () => import('@/views/EmbeddingView.vue'),
+                },
+                {
+                    path: ':path(.*)*',
+                    name: 'not-found',
+                    component: () => import('@/views/NotFoundView.vue'),
                 },
             ],
         },

@@ -17,6 +17,14 @@ createApi<WordEditCategoryReq, WordEditCategoryRes>('/word/edit-category', async
             }
 
             category.description = description;
+
+            if (category.vectorId) {
+                if (chroma) {
+                    await chroma.delete({ ids: [category.vectorId.toString()] });
+                }
+                category.vectorId = null;
+            }
+
             await category.save({ transaction });
             succeed(res);
         });

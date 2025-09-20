@@ -61,6 +61,12 @@
                 </template>
             </ElSkeleton>
         </div>
+        <div class="embed-info-container">
+            <div :class="embedded ? ['embed-info-green'] : ['embed-info-red']">
+                {{ embedded ? '已向量化' : '未向量化' }}
+            </div>
+            <ElButton size="small" @click="embed" :disabled="embedding" v-if="!embedded && loggedIn">向量化</ElButton>
+        </div>
         <div class="titles-container">
             <div class="title">子类</div>
             <ElButton v-if="loggedIn" size="small" @click="toCreate">
@@ -300,18 +306,6 @@ const toChild = async (child: { id: number; value: string }) => {
     });
 };
 
-watch(
-    () => [props.type.id, props.categories[props.categories.length - 1]?.id],
-    async () => {
-        await Promise.all([loadDescription(), loadPageCount()]);
-    },
-    { immediate: false },
-);
-
-onMounted(async () => {
-    await Promise.all([loadDescription(), loadPageCount()]);
-});
-
 const toCreate = async () => {
     await router.push({
         name: 'create-category',
@@ -404,6 +398,78 @@ const genCategory = (category: { id: number; value: string }, id: number) => {
     }
     return toFormat(value, props.format);
 };
+
+const embedded = ref(false);
+const embedding = ref(false);
+
+const loadEmbedded = async () => {
+    try {
+        const response = (
+            await request('/embedding/category', { id: props.categories[props.categories.length - 1].id })
+        ).data;
+        if (!response.success) {
+            switch (response.reason) {
+                case 'not_exists':
+                    myAlert.error('加载向量化信息失败: 单词不存在');
+                    return;
+                default:
+                    myAlert.error('加载向量化信息失败: 未知错误');
+                    return;
+            }
+        }
+        embedded.value = response.embedded;
+    } catch (e) {
+        myAlert.error('加载向量化信息失败: 网络错误');
+    }
+};
+
+const embed = async () => {
+    try {
+        embedding.value = true;
+        const response = (
+            await loginRequest('/embedding/embed-word', { id: props.categories[props.categories.length - 1].id })
+        ).data;
+        embedding.value = false;
+        if (response.success) {
+            myAlert.success('向量化成功');
+            embedded.value = true;
+            return;
+        } else {
+            switch (response.reason) {
+                case 'embed_all_in_progress':
+                    myAlert.error('向量化失败: 其他向量化任务进行中');
+                    return;
+                case 'no_client':
+                    myAlert.error('向量化失败: 没有可用的向量化客户端');
+                    return;
+                case 'not_exists':
+                    myAlert.error('向量化失败: 单词不存在');
+                    return;
+                default:
+                    myAlert.error('向量化失败: 未知错误');
+            }
+        }
+    } catch (e) {
+        embedding.value = false;
+        if (e instanceof NotLoggedInError) {
+            myAlert.error('向量化失败: 未登录');
+        } else {
+            myAlert.error('向量化失败: 网络错误');
+        }
+    }
+};
+
+onMounted(async () => {
+    await Promise.all([loadDescription(), loadPageCount(), loadEmbedded()]);
+});
+
+watch(
+    () => [props.type.id, props.categories[props.categories.length - 1]?.id],
+    async () => {
+        await Promise.all([loadDescription(), loadPageCount(), loadEmbedded()]);
+    },
+    { immediate: false },
+);
 </script>
 
 <style lang="scss" scoped>
@@ -500,6 +566,24 @@ const genCategory = (category: { id: number; value: string }, id: number) => {
 
     > .el-button {
         margin: 0.25em;
+    }
+}
+
+.embed-info-container {
+    display: flex;
+    padding: 4px;
+    align-items: center;
+
+    .embed-info-green {
+        color: var(--el-color-success-light-3);
+        font-size: small;
+        margin-right: 1rem;
+    }
+
+    .embed-info-red {
+        color: var(--el-color-danger-light-3);
+        font-size: small;
+        margin-right: 1rem;
     }
 }
 </style>

@@ -13,14 +13,16 @@
         "@sequelize/core": "7.0.0-alpha.46",
         "@sequelize/postgres": "7.0.0-alpha.46",
         "@sequelize/sqlite3": "7.0.0-alpha.46",
+        "chromadb": "^3.0.15",
         "common-lib": "workspace:*",
         "express": "^5.1.0",
         "moment-timezone": "^0.6.0",
+        "socket.io": "^4.8.1",
         "sqlite3": "^5.1.7"
     },
     "scripts": {
         "build": "rimraf dist && tsc",
         "build:release": "rimraf dist && tsc --project tsconfig.release.json",
-        "start": "cross-env SQLITE_DB_FILE=local/db.sqlite node dist/main.js"
+        "start": "cross-env SQLITE_DB_FILE=local/db.sqlite CHROMA_HOST=localhost CHROMA_PORT=3022 node dist/main.js"
     }
 }

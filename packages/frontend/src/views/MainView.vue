@@ -18,6 +18,7 @@
             </div>
             <div><RouterLink to="/edit-user">编辑用户信息</RouterLink></div>
             <div><RouterLink to="/admin">管理员页面</RouterLink></div>
+            <div><RouterLink to="/embedding">向量化控制面板</RouterLink></div>
             <div><ElLink @click="logout" underline="never">登出</ElLink></div>
         </template>
         <template v-else>
@@ -27,7 +28,7 @@
         </template>
     </div>
     <div>
-        <RouterView />
+        <RouterView @vue:updated="showUserMenu = false" />
     </div>
 </template>
 
@@ -97,12 +98,9 @@ const logout = async () => {
     }
 };
 
-watch(
-    () => router.currentRoute,
-    () => {
-        showUserMenu.value = false;
-    },
-);
+watch(router.currentRoute, () => {
+    showUserMenu.value = false;
+});
 </script>
 
 <style lang="scss" scoped>

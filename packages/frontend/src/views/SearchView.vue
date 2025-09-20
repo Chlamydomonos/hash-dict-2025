@@ -8,10 +8,13 @@
 <script lang="ts" setup>
 import { myAlert } from '@/lib/my-alert';
 import { request } from '@/lib/request';
+import { loginRequest } from '@/lib/request-helper';
 import { useTitle } from '@/lib/use-title';
 import router from '@/router';
+import { useSessionStore } from '@/stores/session';
 import { useThemeStore } from '@/stores/theme';
 import { checkFormat, toDB } from 'common-lib/word/index';
+import { storeToRefs } from 'pinia';
 import { onMounted } from 'vue';
 
 useThemeStore();
@@ -22,6 +25,8 @@ const props = defineProps({
         required: true,
     },
 });
+
+const { loggedIn } = storeToRefs(useSessionStore());
 
 onMounted(async () => {
     try {
@@ -43,6 +48,16 @@ onMounted(async () => {
                 },
             });
         } else {
+            if (loggedIn && response.reason != 'unknown') {
+                try {
+                    const clientRes = (await loginRequest('/embedding/my-clients', {})).data;
+                    if (clientRes.success && clientRes.count > 0) {
+                        router.replace({ name: 'query', params: { text: props.word } });
+                        return;
+                    }
+                } catch (e) {}
+            }
+
             switch (response.reason) {
                 case 'illegal':
                     myAlert.warning.next('搜索失败：非法单词');

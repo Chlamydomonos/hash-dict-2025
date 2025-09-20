@@ -11,6 +11,11 @@ createApi<WordDeleteCategoryReq, WordDeleteCategoryRes>('/word/delete-category',
             if (!user) {
                 return;
             }
+
+            if (chroma) {
+                await chroma.delete({ ids: [id.toString()] });
+            }
+
             await Category.destroy({ where: { id }, transaction });
             succeed(res);
         });
