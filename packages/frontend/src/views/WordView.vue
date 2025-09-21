@@ -61,12 +61,16 @@
                 </template>
             </ElSkeleton>
         </div>
-        <div class="embed-info-container">
-            <div :class="embedded ? ['embed-info-green'] : ['embed-info-red']">
-                {{ embedded ? '已向量化' : '未向量化' }}
+        <ElSkeleton :loading="embedLoading" :throttle="300" :rows="0">
+            <div class="embed-info-container">
+                <div :class="embedded ? ['embed-info-green'] : ['embed-info-red']">
+                    {{ embedded ? '已向量化' : '未向量化' }}
+                </div>
+                <ElButton size="small" @click="embed" :disabled="embedding" v-if="!embedded && loggedIn">
+                    向量化
+                </ElButton>
             </div>
-            <ElButton size="small" @click="embed" :disabled="embedding" v-if="!embedded && loggedIn">向量化</ElButton>
-        </div>
+        </ElSkeleton>
         <div class="titles-container">
             <div class="title">子类</div>
             <ElButton v-if="loggedIn" size="small" @click="toCreate">
@@ -399,10 +403,12 @@ const genCategory = (category: { id: number; value: string }, id: number) => {
     return toFormat(value, props.format);
 };
 
+const embedLoading = ref(true);
 const embedded = ref(false);
 const embedding = ref(false);
 
 const loadEmbedded = async () => {
+    embedLoading.value = true;
     try {
         const response = (
             await request('/embedding/category', { id: props.categories[props.categories.length - 1].id })
@@ -418,6 +424,7 @@ const loadEmbedded = async () => {
             }
         }
         embedded.value = response.embedded;
+        embedLoading.value = false;
     } catch (e) {
         myAlert.error('加载向量化信息失败: 网络错误');
     }
