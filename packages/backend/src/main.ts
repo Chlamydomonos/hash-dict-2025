@@ -58,6 +58,10 @@ globalThis.socketIO = socketIO;
 globalThis.embeddingClientManager = new EmbeddingClientManager();
 globalThis.embeddingManager = new EmbeddingManager();
 
+process.on('SIGTERM', () => {
+    process.exit(0);
+});
+
 const main = async () => {
     await db.sync();
 
