@@ -92,7 +92,7 @@ export const hashString = async (
                 typeId,
                 parentId,
                 [Op.or]: [
-                    { value: { [Op.like]: `'${word}%'` } },
+                    { value: { [Op.like]: `${word}%` } },
                     sql`${word} like concat(${sql.attribute('value')}, '%')`,
                 ],
             },
@@ -112,7 +112,7 @@ export const hashString = async (
                     addedOne = true;
                 }
             } else {
-                const offset: Base128 = new Array(word.length - prefix.value.length).fill(0);
+                const offset: Base128 = new Array((word.length - prefix.value.length) / 2).fill(0);
                 offset.unshift(1);
                 hash = add128(hash, offset);
             }
