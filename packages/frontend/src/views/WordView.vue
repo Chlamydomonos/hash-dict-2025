@@ -63,10 +63,16 @@
         </div>
         <ElSkeleton :loading="embedLoading" :throttle="300" :rows="0">
             <div class="embed-info-container">
-                <div :class="embedded ? ['embed-info-green'] : ['embed-info-red']">
+                <div :class="embedded ? ['embed-info-green'] : ['embed-info-red']" v-if="!embedLoading">
                     {{ embedded ? '已向量化' : '未向量化' }}
                 </div>
-                <ElButton size="small" @click="embed" :disabled="embedding" v-if="!embedded && loggedIn">
+                <div class="embed-info-loading" v-else>加载中…</div>
+                <ElButton
+                    size="small"
+                    @click="embed"
+                    :disabled="embedding"
+                    v-if="!embedded && loggedIn && !embedLoading"
+                >
                     向量化
                 </ElButton>
             </div>
@@ -589,6 +595,12 @@ watch(
 
     .embed-info-red {
         color: var(--el-color-danger-light-3);
+        font-size: small;
+        margin-right: 1rem;
+    }
+
+    .embed-info-loading {
+        color: var(--el-text-color-secondary);
         font-size: small;
         margin-right: 1rem;
     }
