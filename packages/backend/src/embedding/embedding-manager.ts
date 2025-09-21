@@ -63,8 +63,13 @@ export class EmbeddingManager {
         }
 
         this.inTask = true;
-        await embedWordsById([id]);
-        this.inTask = false;
+        try {
+            await embedWordsById([id]);
+            this.inTask = false;
+        } catch (e) {
+            this.inTask = false;
+            throw e;
+        }
     }
 
     private async emitEmbedAllTask(transaction: Transaction) {
@@ -76,8 +81,13 @@ export class EmbeddingManager {
             transaction,
         });
 
-        await embedWords(words, transaction);
-        this.inTask = false;
+        try {
+            await embedWords(words, transaction);
+            this.inTask = false;
+        } catch (e) {
+            this.inTask = false;
+            throw e;
+        }
     }
 
     private endEmbedAllTask(reason: string) {
